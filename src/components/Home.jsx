@@ -214,7 +214,7 @@ const Home = () => {
           <Typography variant="h6">Favourite Quotes</Typography>
           {favourites.length > 0 ? (
             favourites.map((fav, index) => (
-              <Box key={index} sx={{ mt: 2 }}>
+              <Box key={index} sx={{ mt: 2 }} onClick={() => setQuote(fav)}>
                 <Typography variant="subtitle1">{fav.quote}</Typography>
                 <Typography variant="subtitle2">- {fav.author}</Typography>
               </Box>
