@@ -71,45 +71,48 @@ const Home = () => {
   };
 
   const handleFavourite = () => {
-    if (
-      quote &&
-      favourites.some(
-        (fav) => fav.quote === quote.quote && fav.author === quote.author
-      )
-    ) {
-      setIsButtonDisabled(true);
-      toast.info('Quote already marked as Favorite', {
-        position: 'top-right',
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'colored',
-        onOpen: () => setIsButtonDisabled(true),
-        onClose: () => setIsButtonDisabled(false),
-      });
-    } else if (quote) {
-      const newFavourites = [...favourites, quote];
-      setFavourites(newFavourites);
-      storeQuotes(userEmail, {
-        ...getStoredQuotes(userEmail),
-        favourites: newFavourites,
-      });
+    if (quote) {
+      const isAlreadyFavourite = favourites.some(
+        (fav) =>
+          fav.quote.trim().toLowerCase() === quote.quote.trim().toLowerCase() &&
+          fav.author.trim().toLowerCase() === quote.author.trim().toLowerCase()
+      );
 
-      toast.success('Quote added to Favorites', {
-        position: 'top-right',
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'colored',
-        onOpen: () => setIsButtonDisabled(true),
-        onClose: () => setIsButtonDisabled(false),
-      });
+      if (isAlreadyFavourite) {
+        setIsButtonDisabled(true);
+        toast.info('Quote already marked as Favorite', {
+          position: 'top-right',
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'colored',
+          onOpen: () => setIsButtonDisabled(true),
+          onClose: () => setIsButtonDisabled(false),
+        });
+      } else {
+        const newFavourites = [...favourites, quote];
+        setFavourites(newFavourites);
+        storeQuotes(userEmail, {
+          ...getStoredQuotes(userEmail),
+          favourites: newFavourites,
+        });
+
+        toast.success('Quote added to Favorites', {
+          position: 'top-right',
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'colored',
+          onOpen: () => setIsButtonDisabled(true),
+          onClose: () => setIsButtonDisabled(false),
+        });
+      }
     }
   };
 

@@ -1,21 +1,16 @@
-// src/utils/auth.js
-
 export const login = (email, password) => {
   const users = JSON.parse(localStorage.getItem('users')) || [];
 
-  // Find the user with the provided email
   const storedUser = users.find((user) => user.email === email);
 
-  // Check if the email and password match the stored data
   if (storedUser && storedUser.password === password) {
-    localStorage.setItem('isLoggedIn', true); // Indicating that the user is authenticated
-    localStorage.setItem('currentUserEmail', email); // Store the current user's email
-    return true; // Successful login
+    localStorage.setItem('isLoggedIn', true);
+    localStorage.setItem('currentUserEmail', email);
+    return true;
   }
-  return false; // Login failed
+  return false;
 };
 
-// Function to register a new user
 export const register = (userData) => {
   const users = JSON.parse(localStorage.getItem('users')) || [];
 
@@ -34,10 +29,23 @@ export const register = (userData) => {
 };
 
 export const logout = () => {
-  localStorage.removeItem('isLoggedIn'); // Removing the login status
-  localStorage.removeItem('currentUserEmail'); // Removing the current user email
-  // Optionally, remove user-specific data if needed
-  // localStorage.removeItem(`quotes_${getCurrentUserEmail()}`);
+  const currentUserEmail = getCurrentUserEmail();
+
+  localStorage.removeItem('isLoggedIn');
+  localStorage.removeItem('currentUserEmail');
+
+  if (currentUserEmail) {
+    const storedQuotes = JSON.parse(
+      localStorage.getItem(`quotes_${currentUserEmail}`)
+    );
+    if (storedQuotes) {
+      const updatedQuotes = { favourites: storedQuotes.favourites || [] };
+      localStorage.setItem(
+        `quotes_${currentUserEmail}`,
+        JSON.stringify(updatedQuotes)
+      );
+    }
+  }
 };
 
 export const getUser = () => {
@@ -46,7 +54,6 @@ export const getUser = () => {
   return users.find((user) => user.email === currentUserEmail) || null;
 };
 
-// New function to get the current logged-in user's email
 export const getCurrentUserEmail = () => {
   return localStorage.getItem('currentUserEmail') || null;
 };
