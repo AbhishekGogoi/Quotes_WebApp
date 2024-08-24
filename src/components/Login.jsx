@@ -11,14 +11,23 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
-import Joi from "joi-browser";
+import Joi from "joi";
 import { login } from "../utils/auth";
 
 const defaultTheme = createTheme();
 
 const schema = Joi.object({
-  email: Joi.string().email().required().label("Email Address"),
-  password: Joi.string().min(6).required().label("Password"),
+  email: Joi.string()
+    .email({ tlds: { allow: false } })
+    .required()
+    .messages({
+      "string.empty": "Email is required",
+      "string.email": "Email must be a valid email",
+    }),
+  password: Joi.string().min(6).required().messages({
+    "string.empty": "Password is required",
+    "string.min": "Password must be at least 6 characters long",
+  }),
 });
 
 const Login = () => {
@@ -33,11 +42,12 @@ const Login = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setLoginData({
-      ...loginData,
+    setLoginData((prevData) => ({
+      ...prevData,
       [name]: value,
-    });
+    }));
 
+    // Validate the specific field
     const fieldSchema = Joi.object({ [name]: schema.extract(name) });
     const { error } = fieldSchema.validate({ [name]: value });
 

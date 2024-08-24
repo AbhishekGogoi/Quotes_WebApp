@@ -7,14 +7,16 @@ import {
   AppBar,
   Toolbar,
   IconButton,
-  Grid,
+  Paper,
   TextField,
+  CircularProgress,
 } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useNavigate } from "react-router-dom";
 import { logout, getUser } from "../utils/auth";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-// Utility functions to manage user-specific local storage
 const getStoredQuotes = (email) => {
   return JSON.parse(localStorage.getItem(`quotes_${email}`)) || {};
 };
@@ -26,15 +28,15 @@ const Home = () => {
   const [quote, setQuote] = useState(null);
   const [favourites, setFavourites] = useState([]);
   const [category, setCategory] = useState("happiness");
-  const [editMode, setEditMode] = useState(false);
+  const [editMode, setEditMode] = useState(null);
   const [editedQuote, setEditedQuote] = useState("");
   const [editedAuthor, setEditedAuthor] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   const user = getUser();
   const userEmail = user ? user.email : null;
 
-  // Load quotes from local storage on component mount
   useEffect(() => {
     if (userEmail) {
       const storedQuotes = getStoredQuotes(userEmail);
@@ -45,13 +47,13 @@ const Home = () => {
     }
   }, [userEmail]);
 
-  // Fetch a random quote
   const fetchQuote = async () => {
+    setLoading(true);
     try {
       const response = await axios.get(
         `https://api.api-ninjas.com/v1/quotes?category=${category}`,
         {
-          headers: { "X-Api-Key": "RnSZo8KhdwhiEfgW6zA3+w==qB3s4kUJuDJFY7gm" }, // Replace 'YOUR_API_KEY' with your actual API key
+          headers: { "X-Api-Key": import.meta.env.VITE_API_Ninjas_API_KEY },
         }
       );
 
@@ -63,66 +65,91 @@ const Home = () => {
         "Error fetching quote:",
         error.response ? error.response.data : error.message
       );
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleFavourite = () => {
     if (
       quote &&
-      !favourites.some(
+      favourites.some(
         (fav) => fav.quote === quote.quote && fav.author === quote.author
       )
     ) {
+      toast.info("Quote already marked as Favorite", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+    } else if (quote) {
       const newFavourites = [...favourites, quote];
       setFavourites(newFavourites);
       storeQuotes(userEmail, {
         ...getStoredQuotes(userEmail),
         favourites: newFavourites,
       });
+
+      toast.success("Quote added to Favorites", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
     }
   };
 
-  const handleUnfavourite = () => {
+  const handleUnfavourite = (favQuote) => {
     const newFavourites = favourites.filter(
       (favourite) =>
-        favourite.quote !== quote.quote || favourite.author !== quote.author
+        favourite.quote !== favQuote.quote ||
+        favourite.author !== favQuote.author
     );
     setFavourites(newFavourites);
     storeQuotes(userEmail, {
       ...getStoredQuotes(userEmail),
       favourites: newFavourites,
     });
+    toast.info("Quote removed from Favorites", {
+      position: "top-right",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+    });
   };
 
-  const handleEditQuote = () => {
-    if (quote) {
-      setEditMode(true);
-      setEditedQuote(quote.quote);
-      setEditedAuthor(quote.author);
-    }
+  const handleEditQuote = (favQuote) => {
+    setEditMode(favQuote);
+    setEditedQuote(favQuote.quote);
+    setEditedAuthor(favQuote.author);
   };
 
   const handleSaveEdit = () => {
-    if (quote) {
-      const updatedQuote = {
-        ...quote,
-        quote: editedQuote,
-        author: editedAuthor,
-      };
-      setQuote(updatedQuote);
-      setEditMode(false);
-
-      // Update the stored quotes and favourites
-      const newFavourites = favourites.map((fav) =>
-        fav.quote === quote.quote && fav.author === quote.author
-          ? updatedQuote
+    if (editMode) {
+      const updatedFavourites = favourites.map((fav) =>
+        fav.quote === editMode.quote && fav.author === editMode.author
+          ? { ...fav, quote: editedQuote, author: editedAuthor }
           : fav
       );
-      setFavourites(newFavourites);
+      setFavourites(updatedFavourites);
       storeQuotes(userEmail, {
-        quote: updatedQuote,
-        favourites: newFavourites,
+        ...getStoredQuotes(userEmail),
+        favourites: updatedFavourites,
       });
+      setEditMode(null);
     }
   };
 
@@ -145,85 +172,100 @@ const Home = () => {
       </AppBar>
 
       <Box sx={{ p: 3 }}>
-        <Button variant="contained" onClick={fetchQuote} sx={{ mb: 2 }}>
-          Get Random Quote
-        </Button>
-
-        {quote && (
-          <Box>
-            {!editMode ? (
-              <>
-                <Typography variant="h6" gutterBottom>
-                  {quote.quote}
-                </Typography>
-                <Typography variant="subtitle1" gutterBottom>
-                  - {quote.author}
-                </Typography>
-              </>
+        <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
+          <Button
+            variant="contained"
+            onClick={fetchQuote}
+            sx={{ mb: 2, width: "200px", height: "45px" }}
+            disabled={loading}
+          >
+            {loading ? (
+              <CircularProgress size={24} color="inherit" />
             ) : (
-              <Box>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  label="Quote"
-                  value={editedQuote}
-                  onChange={(e) => setEditedQuote(e.target.value)}
-                  sx={{ mb: 2 }}
-                />
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  label="Author"
-                  value={editedAuthor}
-                  onChange={(e) => setEditedAuthor(e.target.value)}
-                  sx={{ mb: 2 }}
-                />
-                <Button variant="contained" onClick={handleSaveEdit}>
-                  Save
-                </Button>
-              </Box>
-            )}
+              "Get Random Quote"
+            )}{" "}
+          </Button>
 
-            <Box sx={{ mt: 2 }}>
+          {quote && (
+            <Box>
+              <Typography variant="h6" gutterBottom>
+                {quote.quote}
+              </Typography>
+              <Typography variant="subtitle1" gutterBottom>
+                - {quote.author}
+              </Typography>
+
               <Button
                 variant="contained"
                 onClick={handleFavourite}
-                sx={{ mr: 1 }}
+                sx={{ mt: 2 }}
               >
                 Favourite
               </Button>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={handleUnfavourite}
-              >
-                Unfavourite
-              </Button>
-              <Button
-                variant="contained"
-                onClick={handleEditQuote}
-                sx={{ ml: 1 }}
-              >
-                Edit
-              </Button>
             </Box>
-          </Box>
-        )}
+          )}
+        </Paper>
 
-        <Box sx={{ mt: 4 }}>
-          <Typography variant="h6">Favourite Quotes</Typography>
+        <Paper elevation={3} sx={{ p: 3 }}>
+          <Typography variant="h5" gutterBottom>
+            Favourite Quotes
+          </Typography>
           {favourites.length > 0 ? (
             favourites.map((fav, index) => (
-              <Box key={index} sx={{ mt: 2 }} onClick={() => setQuote(fav)}>
-                <Typography variant="subtitle1">{fav.quote}</Typography>
-                <Typography variant="subtitle2">- {fav.author}</Typography>
+              <Box key={index} sx={{ mt: 2 }}>
+                {editMode && editMode.quote === fav.quote ? (
+                  <Box>
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      label="Quote"
+                      value={editedQuote}
+                      onChange={(e) => setEditedQuote(e.target.value)}
+                      sx={{ mb: 2 }}
+                    />
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      label="Author"
+                      value={editedAuthor}
+                      onChange={(e) => setEditedAuthor(e.target.value)}
+                      sx={{ mb: 2 }}
+                    />
+                    <Button variant="contained" onClick={handleSaveEdit}>
+                      Save
+                    </Button>
+                  </Box>
+                ) : (
+                  <>
+                    <Typography variant="subtitle1">{fav.quote}</Typography>
+                    <Typography variant="subtitle2">- {fav.author}</Typography>
+
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      onClick={() => handleUnfavourite(fav)}
+                      sx={{ mt: 1, mr: 1 }}
+                    >
+                      Unfavourite
+                    </Button>
+                    <Button
+                      variant="contained"
+                      onClick={() => handleEditQuote(fav)}
+                      sx={{ mt: 1 }}
+                    >
+                      Edit
+                    </Button>
+                  </>
+                )}
               </Box>
             ))
           ) : (
             <Typography>No favourite quotes yet.</Typography>
           )}
-        </Box>
+        </Paper>
       </Box>
+
+      <ToastContainer />
     </Box>
   );
 };

@@ -11,16 +11,32 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
-import Joi from "joi-browser";
-import { register } from "../utils/auth"; // Import the register function
+import Joi from "joi";
+import { register } from "../utils/auth";
 
 const defaultTheme = createTheme();
 
 const schema = Joi.object({
-  firstName: Joi.string().min(2).required().label("First Name"),
-  lastName: Joi.string().min(2).required().label("Last Name"),
-  email: Joi.string().email().required().label("Email Address"),
-  password: Joi.string().min(6).required().label("Password"),
+  firstName: Joi.string().min(2).required().label("First Name").messages({
+    "string.empty": "First Name is required",
+    "string.min": "First Name must be at least 2 characters",
+  }),
+  lastName: Joi.string().min(2).required().label("Last Name").messages({
+    "string.empty": "Last Name is required",
+    "string.min": "Last Name must be at least 2 characters",
+  }),
+  email: Joi.string()
+    .email({ tlds: { allow: false } })
+    .required()
+    .label("Email Address")
+    .messages({
+      "string.empty": "Email Address is required",
+      "string.email": "Email must be a valid email",
+    }),
+  password: Joi.string().min(6).required().label("Password").messages({
+    "string.empty": "Password is required",
+    "string.min": "Password must be at least 6 characters long",
+  }),
 });
 
 const Signup = () => {
@@ -34,14 +50,13 @@ const Signup = () => {
   });
 
   const [errors, setErrors] = useState({});
-  const [registrationError, setRegistrationError] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData((prevData) => ({
+      ...prevData,
       [name]: value,
-    });
+    }));
 
     const fieldSchema = Joi.object({ [name]: schema.extract(name) });
     const { error } = fieldSchema.validate({ [name]: value });
@@ -77,7 +92,7 @@ const Signup = () => {
       if (result.success) {
         navigate("/");
       } else {
-        setRegistrationError(result.message);
+        setErrors({ email: "Email is already registered" });
       }
     }
   };
