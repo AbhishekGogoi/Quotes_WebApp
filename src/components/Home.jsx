@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import {
   Box,
@@ -27,6 +27,7 @@ const storeQuotes = (email, quotes) => {
 const Home = () => {
   const [quote, setQuote] = useState(null);
   const [favourites, setFavourites] = useState([]);
+  // eslint-disable-next-line no-unused-vars
   const [category, setCategory] = useState("happiness");
   const [editMode, setEditMode] = useState(null);
   const [editedQuote, setEditedQuote] = useState("");

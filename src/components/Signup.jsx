@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -13,31 +13,9 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import Joi from "joi";
 import { register } from "../utils/auth";
+import { signupSchema } from "../utils/validationSchema";
 
 const defaultTheme = createTheme();
-
-const schema = Joi.object({
-  firstName: Joi.string().min(2).required().label("First Name").messages({
-    "string.empty": "First Name is required",
-    "string.min": "First Name must be at least 2 characters",
-  }),
-  lastName: Joi.string().min(2).required().label("Last Name").messages({
-    "string.empty": "Last Name is required",
-    "string.min": "Last Name must be at least 2 characters",
-  }),
-  email: Joi.string()
-    .email({ tlds: { allow: false } })
-    .required()
-    .label("Email Address")
-    .messages({
-      "string.empty": "Email Address is required",
-      "string.email": "Email must be a valid email",
-    }),
-  password: Joi.string().min(6).required().label("Password").messages({
-    "string.empty": "Password is required",
-    "string.min": "Password must be at least 6 characters long",
-  }),
-});
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -58,7 +36,7 @@ const Signup = () => {
       [name]: value,
     }));
 
-    const fieldSchema = Joi.object({ [name]: schema.extract(name) });
+    const fieldSchema = Joi.object({ [name]: signupSchema.extract(name) });
     const { error } = fieldSchema.validate({ [name]: value });
 
     if (error) {
@@ -78,7 +56,7 @@ const Signup = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const { error } = schema.validate(formData, { abortEarly: false });
+    const { error } = signupSchema.validate(formData, { abortEarly: false });
 
     if (error) {
       const newErrors = {};

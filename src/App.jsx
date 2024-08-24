@@ -1,4 +1,3 @@
-import React from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -8,9 +7,9 @@ import {
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import Home from "./components/Home";
-import { isAuthenticated } from "./utils/auth"; // Import the authentication function
+import PropTypes from "prop-types";
+import { isAuthenticated } from "./utils/auth";
 
-// ProtectedRoute component
 const ProtectedRoute = ({ element }) => {
   return isAuthenticated() ? element : <Navigate to="/" replace />;
 };
@@ -20,15 +19,17 @@ function App() {
     <>
       <Router>
         <Routes>
-          {/* Default route redirects to login */}
           <Route path="/" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          {/* Protect the home route */}
           <Route path="/home" element={<ProtectedRoute element={<Home />} />} />
         </Routes>
       </Router>
     </>
   );
 }
+
+ProtectedRoute.propTypes = {
+  element: PropTypes.element.isRequired,
+};
 
 export default App;

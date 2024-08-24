@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -13,22 +13,9 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import Joi from "joi";
 import { login } from "../utils/auth";
+import { loginSchema } from "../utils/validationSchema";
 
 const defaultTheme = createTheme();
-
-const schema = Joi.object({
-  email: Joi.string()
-    .email({ tlds: { allow: false } })
-    .required()
-    .messages({
-      "string.empty": "Email is required",
-      "string.email": "Email must be a valid email",
-    }),
-  password: Joi.string().min(6).required().messages({
-    "string.empty": "Password is required",
-    "string.min": "Password must be at least 6 characters long",
-  }),
-});
 
 const Login = () => {
   const navigate = useNavigate();
@@ -47,8 +34,7 @@ const Login = () => {
       [name]: value,
     }));
 
-    // Validate the specific field
-    const fieldSchema = Joi.object({ [name]: schema.extract(name) });
+    const fieldSchema = Joi.object({ [name]: loginSchema.extract(name) });
     const { error } = fieldSchema.validate({ [name]: value });
 
     if (error) {
@@ -68,7 +54,7 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const { error } = schema.validate(loginData, { abortEarly: false });
+    const { error } = loginSchema.validate(loginData, { abortEarly: false });
 
     if (error) {
       const newErrors = {};
