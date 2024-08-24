@@ -3,12 +3,12 @@ import {
   Routes,
   Route,
   Navigate,
-} from "react-router-dom";
-import Login from "./components/Login";
-import Signup from "./components/Signup";
-import Home from "./components/Home";
-import PropTypes from "prop-types";
-import { isAuthenticated } from "./utils/auth";
+} from 'react-router-dom';
+import Login from './components/Login';
+import Signup from './components/Signup';
+import Home from './components/Home';
+import PropTypes from 'prop-types';
+import { isAuthenticated } from './utils/auth';
 
 const ProtectedRoute = ({ element }) => {
   return isAuthenticated() ? element : <Navigate to="/" replace />;

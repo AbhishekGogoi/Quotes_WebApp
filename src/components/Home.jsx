@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 import {
   Box,
   Typography,
@@ -10,12 +10,12 @@ import {
   Paper,
   TextField,
   CircularProgress,
-} from "@mui/material";
-import LogoutIcon from "@mui/icons-material/Logout";
-import { useNavigate } from "react-router-dom";
-import { logout, getUser } from "../utils/auth";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+} from '@mui/material';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { useNavigate } from 'react-router-dom';
+import { logout, getUser } from '../utils/auth';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const getStoredQuotes = (email) => {
   return JSON.parse(localStorage.getItem(`quotes_${email}`)) || {};
@@ -27,11 +27,9 @@ const storeQuotes = (email, quotes) => {
 const Home = () => {
   const [quote, setQuote] = useState(null);
   const [favourites, setFavourites] = useState([]);
-  // eslint-disable-next-line no-unused-vars
-  const [category, setCategory] = useState("happiness");
   const [editMode, setEditMode] = useState(null);
-  const [editedQuote, setEditedQuote] = useState("");
-  const [editedAuthor, setEditedAuthor] = useState("");
+  const [editedQuote, setEditedQuote] = useState('');
+  const [editedAuthor, setEditedAuthor] = useState('');
   const [loading, setLoading] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
@@ -53,9 +51,9 @@ const Home = () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `https://api.api-ninjas.com/v1/quotes?category=${category}`,
+        `https://api.api-ninjas.com/v1/quotes?category=`,
         {
-          headers: { "X-Api-Key": import.meta.env.VITE_API_Ninjas_API_KEY },
+          headers: { 'X-Api-Key': import.meta.env.VITE_API_Ninjas_API_KEY },
         }
       );
 
@@ -64,7 +62,7 @@ const Home = () => {
       storeQuotes(userEmail, { ...getStoredQuotes(userEmail), quote: result });
     } catch (error) {
       console.error(
-        "Error fetching quote:",
+        'Error fetching quote:',
         error.response ? error.response.data : error.message
       );
     } finally {
@@ -80,15 +78,15 @@ const Home = () => {
       )
     ) {
       setIsButtonDisabled(true);
-      toast.info("Quote already marked as Favorite", {
-        position: "top-right",
+      toast.info('Quote already marked as Favorite', {
+        position: 'top-right',
         autoClose: 2000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-        theme: "colored",
+        theme: 'colored',
         onOpen: () => setIsButtonDisabled(true),
         onClose: () => setIsButtonDisabled(false),
       });
@@ -100,15 +98,15 @@ const Home = () => {
         favourites: newFavourites,
       });
 
-      toast.success("Quote added to Favorites", {
-        position: "top-right",
+      toast.success('Quote added to Favorites', {
+        position: 'top-right',
         autoClose: 2000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-        theme: "colored",
+        theme: 'colored',
         onOpen: () => setIsButtonDisabled(true),
         onClose: () => setIsButtonDisabled(false),
       });
@@ -126,15 +124,15 @@ const Home = () => {
       ...getStoredQuotes(userEmail),
       favourites: newFavourites,
     });
-    toast.info("Quote removed from Favorites", {
-      position: "top-right",
+    toast.info('Quote removed from Favorites', {
+      position: 'top-right',
       autoClose: 2000,
       hideProgressBar: false,
       closeOnClick: true,
       pauseOnHover: true,
       draggable: true,
       progress: undefined,
-      theme: "colored",
+      theme: 'colored',
       onOpen: () => setIsButtonDisabled(true),
       onClose: () => setIsButtonDisabled(false),
     });
@@ -160,15 +158,15 @@ const Home = () => {
       });
       setEditMode(null);
 
-      toast.success("Quote updated successfully", {
-        position: "top-right",
+      toast.success('Quote updated successfully', {
+        position: 'top-right',
         autoClose: 2000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-        theme: "colored",
+        theme: 'colored',
         onOpen: () => setIsButtonDisabled(true),
         onClose: () => setIsButtonDisabled(false),
       });
@@ -181,7 +179,7 @@ const Home = () => {
 
   const handleLogout = () => {
     logout();
-    navigate("/");
+    navigate('/');
   };
 
   return (
@@ -189,7 +187,7 @@ const Home = () => {
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Welcome, {user ? user.firstName : "Guest"}
+            Welcome, {user ? user.firstName : 'Guest'}
           </Typography>
           <IconButton color="inherit" onClick={handleLogout}>
             <LogoutIcon />
@@ -202,14 +200,14 @@ const Home = () => {
           <Button
             variant="contained"
             onClick={fetchQuote}
-            sx={{ mb: 2, width: "200px", height: "45px" }}
+            sx={{ mb: 2, width: '200px', height: '45px' }}
             disabled={loading}
           >
             {loading ? (
               <CircularProgress size={24} color="inherit" />
             ) : (
-              "Get Random Quote"
-            )}{" "}
+              'Get Random Quote'
+            )}{' '}
           </Button>
 
           {quote && (
@@ -258,7 +256,7 @@ const Home = () => {
                       onChange={(e) => setEditedAuthor(e.target.value)}
                       sx={{ mb: 2 }}
                     />
-                    <Box sx={{ display: "flex", gap: 1 }}>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
                       <Button variant="contained" onClick={handleSaveEdit}>
                         Save
                       </Button>

@@ -73,7 +73,7 @@ Or if you're using yarn:
 yarn dev
 ```
 
-This will start the development server, and you can view the application by navigating to `http://localhost:3000` in your web browser.
+This will start the development server, and you can view the application by navigating to `http://localhost:5173` in your web browser.
 
 ### Build for Production
 
