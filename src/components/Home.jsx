@@ -33,6 +33,7 @@ const Home = () => {
   const [editedQuote, setEditedQuote] = useState("");
   const [editedAuthor, setEditedAuthor] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
   const navigate = useNavigate();
   const user = getUser();
@@ -78,6 +79,7 @@ const Home = () => {
         (fav) => fav.quote === quote.quote && fav.author === quote.author
       )
     ) {
+      setIsButtonDisabled(true);
       toast.info("Quote already marked as Favorite", {
         position: "top-right",
         autoClose: 2000,
@@ -87,6 +89,8 @@ const Home = () => {
         draggable: true,
         progress: undefined,
         theme: "colored",
+        onOpen: () => setIsButtonDisabled(true),
+        onClose: () => setIsButtonDisabled(false),
       });
     } else if (quote) {
       const newFavourites = [...favourites, quote];
@@ -105,6 +109,8 @@ const Home = () => {
         draggable: true,
         progress: undefined,
         theme: "colored",
+        onOpen: () => setIsButtonDisabled(true),
+        onClose: () => setIsButtonDisabled(false),
       });
     }
   };
@@ -129,6 +135,8 @@ const Home = () => {
       draggable: true,
       progress: undefined,
       theme: "colored",
+      onOpen: () => setIsButtonDisabled(true),
+      onClose: () => setIsButtonDisabled(false),
     });
   };
 
@@ -151,7 +159,24 @@ const Home = () => {
         favourites: updatedFavourites,
       });
       setEditMode(null);
+
+      toast.success("Quote updated successfully", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        onOpen: () => setIsButtonDisabled(true),
+        onClose: () => setIsButtonDisabled(false),
+      });
     }
+  };
+
+  const handleCancelEdit = () => {
+    setEditMode(null);
   };
 
   const handleLogout = () => {
@@ -200,6 +225,7 @@ const Home = () => {
                 variant="contained"
                 onClick={handleFavourite}
                 sx={{ mt: 2 }}
+                disabled={isButtonDisabled}
               >
                 Favourite
               </Button>
@@ -232,9 +258,14 @@ const Home = () => {
                       onChange={(e) => setEditedAuthor(e.target.value)}
                       sx={{ mb: 2 }}
                     />
-                    <Button variant="contained" onClick={handleSaveEdit}>
-                      Save
-                    </Button>
+                    <Box sx={{ display: "flex", gap: 1 }}>
+                      <Button variant="contained" onClick={handleSaveEdit}>
+                        Save
+                      </Button>
+                      <Button variant="outlined" onClick={handleCancelEdit}>
+                        Cancel
+                      </Button>
+                    </Box>
                   </Box>
                 ) : (
                   <>
@@ -246,6 +277,7 @@ const Home = () => {
                       color="secondary"
                       onClick={() => handleUnfavourite(fav)}
                       sx={{ mt: 1, mr: 1 }}
+                      disabled={isButtonDisabled}
                     >
                       Unfavourite
                     </Button>
@@ -253,6 +285,7 @@ const Home = () => {
                       variant="contained"
                       onClick={() => handleEditQuote(fav)}
                       sx={{ mt: 1 }}
+                      disabled={isButtonDisabled}
                     >
                       Edit
                     </Button>
