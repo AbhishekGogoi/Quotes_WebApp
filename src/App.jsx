@@ -9,6 +9,7 @@ import Signup from './components/Signup';
 import Home from './components/Home';
 import PropTypes from 'prop-types';
 import { isAuthenticated } from './utils/auth';
+import AuthRoute from './utils/AuthRoute';
 
 const ProtectedRoute = ({ element }) => {
   return isAuthenticated() ? element : <Navigate to="/" replace />;
@@ -19,8 +20,14 @@ function App() {
     <>
       <Router>
         <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+          <Route
+            path="/"
+            element={<AuthRoute element={<Login />} redirectTo="/home" />}
+          />
+          <Route
+            path="/signup"
+            element={<AuthRoute element={<Signup />} redirectTo="/home" />}
+          />
           <Route path="/home" element={<ProtectedRoute element={<Home />} />} />
         </Routes>
       </Router>

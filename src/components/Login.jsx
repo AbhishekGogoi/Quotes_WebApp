@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import Joi from 'joi';
 import { login } from '../utils/auth';
 import { loginSchema } from '../utils/validationSchema';
+import { isAuthenticated } from '../utils/auth';
 
 const defaultTheme = createTheme();
 
@@ -51,6 +52,11 @@ const Login = () => {
       });
     }
   };
+
+  // useEffect(() => {
+  //   isAuthenticated();
+  //   navigate('/home');
+  // }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
